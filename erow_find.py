@@ -30,6 +30,8 @@ r2_stop = 1000
 # R2 values per decade (12, 24 and 48 supported)
 r2_e_row = 24
 
+func = lambda x,y: 1/(2*math.pi * (350 + 2*x) * (y/1000000000 + 0.5/1000000000))
+
 ##########################
 # -- INPUT VALUES END -- #
 ##########################
@@ -83,7 +85,7 @@ def create_values(a, b, e):
 
 
 # find and print best values on screen
-def print_best_values(r1, r2):
+def print_best_values(r1, r2, f):
     # pre-set best difference to some big value
     best_diff = 99999999
 
@@ -106,7 +108,8 @@ def print_best_values(r1, r2):
             #A = j/(i+j)             # voltage divider (desired value is "amplification" e.g. 0.5 for a divider that divides in half)
             #A = 1.23 * (1 + i/j) + (-0.000000020 * i)    # LP2954 output voltage
             #A = 1/(2*math.pi * (350 + 2*i) * j/1000000000) # differential analog filter on GMS (with "R2" in "nF")
-            A = 1/(2*math.pi * (350 + 2*i) * (j/1000000000 + 0.5/1000000000)) # combined DM+CM analog filter on GMS (with "R2" in "nF" and 1 nF from each line to ground as CM part)
+            #A = 1/(2*math.pi * (350 + 2*i) * (j/1000000000 + 0.5/1000000000)) # combined DM+CM analog filter on GMS (with "R2" in "nF" and 1 nF from each line to ground as CM part)
+            A = f(i, j)
 
             # find best value that is smaller than the desired value
             if is_upper_bound:
@@ -135,4 +138,4 @@ r1 = create_values(r1_start, r1_stop, r1_e_row)
 r2 = create_values(r2_start, r2_stop, r2_e_row)
 
 # find and print best values
-print_best_values(r1, r2)
+print_best_values(r1, r2, func)
