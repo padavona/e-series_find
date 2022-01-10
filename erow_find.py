@@ -30,7 +30,18 @@ r2_stop = 1000
 # R2 values per decade (12, 24 and 48 supported)
 r2_e_row = 24
 
-func = lambda x,y: 1/(2*math.pi * (350 + 2*x) * (y/1000000000 + 0.5/1000000000))
+# Select desired formula by un-commenting lambda or add own lambda
+# func = lambda x,y: (2 * x/y) + 1                                    # instrumentation amplifier gain
+# func = lambda x,y: (x*y) / (x+y)                                    # parallel resistors
+# func = lambda x,y: x + y                                            # series resistors
+# func = lambda x,y: x + x + y                                        # series resistors x3
+# func = lambda x,y: 1.016 * (x/y + 1)                                # LM43601 DC/DC switching converter output voltage
+# func = lambda x,y: (1.2/y) * (x + y)                                # LM43601 DC/DC swichting converter shutdown voltage
+# func = lambda x,y: 1.21 * (1 + (y/x)) + (0.000003 * x)              # TPS73801 LDO output voltage
+# func = lambda x,y: y/(x+y)                                          # voltage divider (desired value is "amplification" e.g. 0.5 for a divider that divides in half)
+# func = lambda x,y: 1.23 * (1 + x/y) + (-20e-9 * x)                  # LP2954 output voltage
+# func = lambda x,y: 1/(2*math.pi * (350 + 2*x) * y/1e9)              # differential analog filter on GMS (with "R2" in "nF")
+func = lambda x,y: 1/(2*math.pi * (350 + 2*x) * (y/1e9 + 0.5/1e9))  # combined DM+CM analog filter on GMS (with "R2" in "nF" and 1 nF from each line to ground as CM part)
 
 ##########################
 # -- INPUT VALUES END -- #
@@ -97,18 +108,6 @@ def print_best_values(r1, r2, f):
     # find best values by testing every possible combination
     for i in r1:
         for j in r2:
-            # Select desired formula by un-commenting
-            #A = (2 * i / j) + 1     # instrumentation amplifier gain
-            #A = (i*j) / (i+j)       # parallel resistors
-            #A = i + j               # series resistors
-            #A = i + i + j           # series resistors x3
-            #A = 1.016 * (i/j + 1)   # LM43601 DC/DC switching converter output voltage
-            #A = (1.2/j) * (i + j)   # LM43601 DC/DC swichting converter shutdown voltage
-            #A = 1.21 * (1 + (j/i)) + 0.000003 * i # TPS73801 LDO output voltage
-            #A = j/(i+j)             # voltage divider (desired value is "amplification" e.g. 0.5 for a divider that divides in half)
-            #A = 1.23 * (1 + i/j) + (-0.000000020 * i)    # LP2954 output voltage
-            #A = 1/(2*math.pi * (350 + 2*i) * j/1000000000) # differential analog filter on GMS (with "R2" in "nF")
-            #A = 1/(2*math.pi * (350 + 2*i) * (j/1000000000 + 0.5/1000000000)) # combined DM+CM analog filter on GMS (with "R2" in "nF" and 1 nF from each line to ground as CM part)
             A = f(i, j)
 
             # find best value that is smaller than the desired value
