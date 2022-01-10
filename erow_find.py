@@ -9,26 +9,26 @@ import math
 ############################
 
 # desired value
-x = 1900
+desired = 1900
 
 # is desired value an upper bound?
 # False: Find value that is closest to desired value
 # True: Find value that is closest to desired value, but not bigger than desired value
 is_upper_bound = False
 
-# R1 range (powers of 10 supported)
-r1_start = 100
-r1_stop = 1000
+# X range (powers of 10 supported)
+x_start = 100
+x_stop = 1000
 
-# R1 values per decade (12, 24 and 48 supported)
-r1_e_row = 24
+# X values per decade (12, 24 and 48 supported)
+x_e_row = 24
 
-# R2 range (powers of 10 supported)
-r2_start = 100
-r2_stop = 1000
+# Y range (powers of 10 supported)
+y_start = 100
+y_stop = 1000
 
-# R2 values per decade (12, 24 and 48 supported)
-r2_e_row = 24
+# Y values per decade (12, 24 and 48 supported)
+y_e_row = 24
 
 # Select desired formula by un-commenting lambda or add own lambda
 # func = lambda x,y: (2 * x/y) + 1                                    # instrumentation amplifier gain
@@ -37,7 +37,7 @@ r2_e_row = 24
 # func = lambda x,y: x + x + y                                        # series resistors x3
 # func = lambda x,y: 1.016 * (x/y + 1)                                # LM43601 DC/DC switching converter output voltage
 # func = lambda x,y: (1.2/y) * (x + y)                                # LM43601 DC/DC swichting converter shutdown voltage
-# func = lambda x,y: 1.21 * (1 + (y/x)) + (0.000003 * x)              # TPS73801 LDO output voltage
+# func = lambda x,y: 1.21 * (1 + (y/x)) + (3e-6 * x)                  # TPS73801 LDO output voltage
 # func = lambda x,y: y/(x+y)                                          # voltage divider (desired value is "amplification" e.g. 0.5 for a divider that divides in half)
 # func = lambda x,y: 1.23 * (1 + x/y) + (-20e-9 * x)                  # LP2954 output voltage
 # func = lambda x,y: 1/(2*math.pi * (350 + 2*x) * y/1e9)              # differential analog filter on GMS (with "R2" in "nF")
@@ -63,16 +63,16 @@ e48 = [1.00, 1.05, 1.10, 1.15, 1.21, 1.27, 1.33, 1.40, 1.47, 1.54, 1.62, 1.69,
 # TODO: E-96 base values
 #e96 = [1.00, 1.02, 1.05, 1.07, 1.10, 1.13, 1.15, 1.18, 1.21, 1.24, 1.27, 1.30, 1.33, 1.37, 1.40, 1.43, 1.47, 1.50, 1.54, 1.58, 1.62, 1.65, 1.69, 1.74, 1.78, 1.82, 1.87, 1.91, 1.96, 2.00, 2.05, 2.10,
 
-# get number of decades between resistor value a and b
+# get number of decades between two values
 def get_decades(a, b):
     decades = 0
     while a * 10 <= b:
-        a = a * 10
+        a *= 10
         decades += 1
     return decades
 
 
-# create list of resistor values in range a...b that are in E-Row e
+# create list of values in range a...b that are in E-Row e
 def create_values(a, b, e):
     total_values = e * get_decades(a, b)
     values = []
@@ -96,45 +96,45 @@ def create_values(a, b, e):
 
 
 # find and print best values on screen
-def print_best_values(r1, r2, f):
+def print_best_values(x, y, f):
     # pre-set best difference to some big value
     best_diff = 99999999
 
     # buffer for best values
-    r1_best = 0
-    r2_best = 0
-    a_best = 0
+    x_best = 0
+    y_best = 0
+    desired_best = 0
     
     # find best values by testing every possible combination
-    for i in r1:
-        for j in r2:
-            A = f(i, j)
+    for i in x:
+        for j in y:
+            result = f(i, j)
 
             # find best value that is smaller than the desired value
             if is_upper_bound:
-                diff = x - A
+                diff = desired - result
                 if (diff < best_diff) and (diff >= 0):
                     best_diff = diff
-                    r1_best = i
-                    r2_best = j
-                    a_best = A
+                    x_best = i
+                    y_best = j
+                    desired_best = result
             # find best value
             else:
-                diff = abs(x - A)
+                diff = abs(desired - result)
                 if (diff < best_diff):
                     best_diff = diff
-                    r1_best = i
-                    r2_best = j
-                    a_best = A
+                    x_best = i
+                    y_best = j
+                    desired_best = result
 
     # print best values
-    print("best value for R1:       ", round(r1_best, 2), "Ohm (E-" + str(r1_e_row) + ")")
-    print("best value for R2:       ", round(r2_best, 2), "Ohm (E-" + str(r2_e_row) + ")")
-    print("best result:             ", round(a_best, 3))
+    print("best value for R1:       ", round(x_best, 2), "Ohm (E-" + str(x_e_row) + ")")
+    print("best value for R2:       ", round(y_best, 2), "Ohm (E-" + str(y_e_row) + ")")
+    print("best result:             ", round(desired_best, 3))
 
 # create full set of E-row values
-r1 = create_values(r1_start, r1_stop, r1_e_row)
-r2 = create_values(r2_start, r2_stop, r2_e_row)
+r1 = create_values(x_start, x_stop, x_e_row)
+r2 = create_values(y_start, y_stop, y_e_row)
 
 # find and print best values
 print_best_values(r1, r2, func)
