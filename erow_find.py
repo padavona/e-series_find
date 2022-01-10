@@ -68,7 +68,7 @@ def get_decades(a, b):
     decades = 0
     while a * 10 <= b:
         a = a * 10
-        decades = decades + 1
+        decades += 1
     return decades
 
 
@@ -89,8 +89,8 @@ def create_values(a, b, e):
     while index < total_values:
         values.append(a * e_values[index % e] * decade)
         if (index % e) == (e - 1):
-            decade = decade * 10
-        index = index + 1
+            decade *= 10
+        index += 1
 
     return values
 
