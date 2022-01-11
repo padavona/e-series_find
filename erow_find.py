@@ -181,7 +181,6 @@ def get_values(
     for decade in decades:
         for base_value in base_values:
             value = decade * base_value
-            # print(value)
             if start <= value <= stop:
                 yield value
 
