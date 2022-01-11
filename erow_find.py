@@ -22,16 +22,14 @@ x_start = 100
 x_stop = 1000
 
 # X values per decade (12, 24 and 48 supported)
-x_e_row = 24
-x_e_row_ = {'e12', 'e24'}
+x_e_row_ = {'e12', 'e24', 'e48'}
 
 # Y range (powers of 10 supported)
 y_start = 100
 y_stop = 1000
 
 # Y values per decade (12, 24 and 48 supported)
-y_e_row = 24
-y_e_row_ = {'e12', 'e24'}
+y_e_row_ = {'e12', 'e24', 'e48'}
 
 # Select desired formula by un-commenting lambda or add own lambda
 # func = lambda x,y: (2 * x/y) + 1                                    # instrumentation amplifier gain
@@ -91,29 +89,6 @@ def get_start_decade(start: float):
     else:
         return None
 
-    # return start_decade
-
-# create list of values in range a...b that are in E-Row e
-def create_values(a, b, e):
-    total_values = e * get_decades(a, b)
-    values = []
-    index = 0
-    decade = 1
-
-    if e == 12:
-        e_values = e12
-    elif e == 24:
-        e_values = e24
-    else:
-        e_values = e48
-
-    while index < total_values:
-        values.append(a * e_values[index % e] * decade)
-        if (index % e) == (e - 1):
-            decade *= 10
-        index += 1
-
-    return values
 
 def get_base_values(erows: set[str]) -> set[float]:
     # base value sets per e-row
@@ -141,12 +116,10 @@ def get_base_values(erows: set[str]) -> set[float]:
 def get_values(start: float, stop: float, base_values: set[float]):
     first_decade = get_start_decade(start)
     no_of_decades = get_decades(first_decade, stop) + 1
-    # print(first_decade)
+ 
     decades = [first_decade]
     for i in range(no_of_decades):
         decades.append(decades[i] * 10)
-
-    # print(decades)
 
     for decade in decades:
         for base_value in base_values:
@@ -156,7 +129,7 @@ def get_values(start: float, stop: float, base_values: set[float]):
                 yield value
 
 # find and print best values on screen
-def print_best_values(x, y, f):
+def print_best_values(f):
     # pre-set best difference to some big value
     best_diff = 99999999
 
@@ -188,16 +161,12 @@ def print_best_values(x, y, f):
                     desired_best = result
 
     # print best values
-    print("best value for R1:       ", round(x_best, 2), "Ohm (E-" + str(x_e_row) + ")")
-    print("best value for R2:       ", round(y_best, 2), "Ohm (E-" + str(y_e_row) + ")")
-    print("best result:             ", round(desired_best, 3))
-
-# create full set of E-row values
-r1 = create_values(x_start, x_stop, x_e_row)
-r2 = create_values(y_start, y_stop, y_e_row)
+    print(f"best value for R1:       {round(x_best, 2)}")
+    print(f"best value for R2:       {round(y_best, 2)}")
+    print(f"best result:             {round(desired_best, 3)}")
 
 # find and print best values
-print_best_values(r1, r2, func)
+print_best_values(func)
 
 # print(get_base_values({'e12', 'e24', 'e48'}))
 
