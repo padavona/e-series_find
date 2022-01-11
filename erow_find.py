@@ -10,7 +10,7 @@ import math
 ############################
 
 # desired value
-desired = 251
+desired = 200
 
 # is desired value an upper bound?
 # False: Find value that is closest to desired value
@@ -22,14 +22,14 @@ x_start = 100
 x_stop = 100000
 
 # set of e-rows (12, 24 and 48 supported)
-x_e_row_ = {'e12', 'e24', 'e48'}
+x_e_row_ = {'e12', 'e24'}
 
 # Y range (powers of 10 supported)
 y_start = 100
 y_stop = 100000
 
 # set of e-rows (12, 24 and 48 supported)
-y_e_row_ = {'e12', 'e24', 'e48'}
+y_e_row_ = {'e12', 'e24'}
 
 # Select desired formula by un-commenting lambda or add own lambda
 func = lambda x,y: (2 * x/y) + 1                                    # instrumentation amplifier gain
@@ -147,8 +147,8 @@ def print_best_values(f: Callable) -> None:
                     desired_best = result
 
     # print best values
-    print(f"best value for R1:       {round(x_best, 2)}")
-    print(f"best value for R2:       {round(y_best, 2)}")
+    print(f"best value for X:        {round(x_best, 2)}")
+    print(f"best value for Y:        {round(y_best, 2)}")
     print(f"best result:             {round(desired_best, 4)}")
     print(f"error to desired value:  {round((desired_best - desired)/desired*100,3)} %")
 
