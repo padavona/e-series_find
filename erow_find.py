@@ -2,7 +2,7 @@
 # passive components, e. g. for op amp gain or
 # voltage regulator feedback networks.
 
-from typing import Generator
+from typing import Generator, Callable
 import math
 
 ############################
@@ -10,7 +10,7 @@ import math
 ############################
 
 # desired value
-desired = 10000
+desired = 251
 
 # is desired value an upper bound?
 # False: Find value that is closest to desired value
@@ -19,22 +19,22 @@ is_upper_bound = False
 
 # X range (powers of 10 supported)
 x_start = 100
-x_stop = 10000
+x_stop = 100000
 
 # set of e-rows (12, 24 and 48 supported)
 x_e_row_ = {'e12', 'e24', 'e48'}
 
 # Y range (powers of 10 supported)
 y_start = 100
-y_stop = 1000
+y_stop = 100000
 
 # set of e-rows (12, 24 and 48 supported)
 y_e_row_ = {'e12', 'e24', 'e48'}
 
 # Select desired formula by un-commenting lambda or add own lambda
-# func = lambda x,y: (2 * x/y) + 1                                    # instrumentation amplifier gain
+func = lambda x,y: (2 * x/y) + 1                                    # instrumentation amplifier gain
 # func = lambda x,y: (x*y) / (x+y)                                    # parallel resistors
-func = lambda x,y: x + y                                            # series resistors
+# func = lambda x,y: x + y                                            # series resistors
 # func = lambda x,y: x + x + y                                        # series resistors x3
 # func = lambda x,y: 1.016 * (x/y + 1)                                # LM43601 DC/DC switching converter output voltage
 # func = lambda x,y: (1.2/y) * (x + y)                                # LM43601 DC/DC swichting converter shutdown voltage
@@ -49,7 +49,6 @@ func = lambda x,y: x + y                                            # series res
 ##########################
 
 
-# get number of decades between two values
 def get_decades(start: float, stop: float) -> int:
     decades = 0
     while start * 10 <= stop:
@@ -115,8 +114,8 @@ def get_values(start: float, stop: float, base_values: set[float]) -> Generator[
             if start <= value <= stop:
                 yield value
 
-# find and print best values on screen
-def print_best_values(f):
+
+def print_best_values(f: Callable) -> None:
     # pre-set best difference to some big value
     best_diff = 99999999
 
@@ -148,13 +147,15 @@ def print_best_values(f):
                     desired_best = result
 
     # print best values
-    print(f"best value for R1:    {round(x_best, 2)}")
-    print(f"best value for R2:    {round(y_best, 2)}")
-    print(f"best result:          {round(desired_best, 4)}")
-    print(f"error:                {round((desired_best - desired)/desired*100,3)} %")
+    print(f"best value for R1:       {round(x_best, 2)}")
+    print(f"best value for R2:       {round(y_best, 2)}")
+    print(f"best result:             {round(desired_best, 4)}")
+    print(f"error to desired value:  {round((desired_best - desired)/desired*100,3)} %")
+
 
 def main():
     print_best_values(func)
+
 
 if __name__ == '__main__':
     main()
