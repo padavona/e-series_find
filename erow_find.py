@@ -10,7 +10,7 @@ import math
 ############################
 
 # desired value
-desired = 3213
+desired = 999
 
 # is desired value an upper bound?
 # False: Find value that is closest to desired value
@@ -18,19 +18,19 @@ desired = 3213
 is_upper_bound = False
 
 # X range
-x_start = 1
-x_stop = 1e6
+x_start = 100
+x_stop = 200
 
 # set of e-rows (e12, e24, e48 and e96 supported),
-# e. g. x_e_row = {"e12, ""e24"}
+# e. g. x_e_row = {"e12, "e24"}
 x_e_row = {"e12", "e24", "e48", "e96"}
 
 # Y range
-y_start = 1
+y_start = 100
 y_stop = 1e6
 
 # set of e-rows (e12, e24, e48 and e96 supported),
-# e. g. x_e_row = {"e12, ""e24"}
+# e. g. x_e_row = {"e12, "e24"}
 y_e_row = {"e12", "e24", "e48", "e96"}
 
 # Select desired formula by un-commenting lambda or add own lambda
