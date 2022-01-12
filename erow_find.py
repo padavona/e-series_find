@@ -38,16 +38,10 @@ y_e_row = {"e12", "e24", "e48", "e96"}
 # func = lambda x, y: (x * y) / (x + y)  # parallel resistors
 func = lambda x, y: x + y  # series resistors
 # func = lambda x, y: x + x + y  # series resistors x3
-# func = lambda x, y: 1.016 * (
-#     x / y + 1
-# )  # LM43601 DC/DC switching converter output voltage
-# func = lambda x, y: (1.2 / y) * (
-#     x + y
-# )  # LM43601 DC/DC swichting converter shutdown voltage
+# func = lambda x, y: 1.016 * (x / y + 1)  # LM43601 DC/DC switching converter output voltage
+# func = lambda x, y: (1.2 / y) * (x + y)  # LM43601 DC/DC swichting converter shutdown voltage
 # func = lambda x, y: 1.21 * (1 + (y / x)) + (3e-6 * x)  # TPS73801 LDO output voltage
-# func = lambda x, y: y / (
-#     x + y
-# )  # voltage divider (desired value is "output" to "input" voltage)
+# func = lambda x, y: y / (x + y)  # voltage divider (desired value is "output" to "input" voltage)
 # func = lambda x, y: 1.23 * (1 + x / y) + (-20e-9 * x)  # LP2954 output voltage
 # func = lambda x, y: 1 / (
 #     2 * math.pi * (350 + 2 * x) * y / 1e9
@@ -280,9 +274,7 @@ def get_base_values(erows: set[str]) -> set[float]:
     return base_values
 
 
-def get_values(
-    start: float, stop: float, base_values: set[float]
-) -> Generator[float, None, None]:
+def get_values(start: float, stop: float, base_values: set[float]) -> Generator[float, None, None]:
     first_decade = get_start_decade(start)
     no_of_decades = get_decades(first_decade, stop)
 
@@ -298,12 +290,8 @@ def get_values(
 
 
 def print_best_values(f: Callable) -> None:
-    assert (
-        x_start <= x_stop
-    ), "Stop value (X) has to be greater than or equal start value"
-    assert (
-        y_start <= y_stop
-    ), "Stop value (Y) has to be greater than or equal start value"
+    assert x_start <= x_stop, "Stop value (X) has to be greater than or equal start value"
+    assert y_start <= y_stop, "Stop value (Y) has to be greater than or equal start value"
     assert x_start != 0, "Start value (X) cannot be 0"
     assert y_start != 0, "Start value (Y) cannot be 0"
 
@@ -348,9 +336,7 @@ def print_best_values(f: Callable) -> None:
         print(f"best value for X:        {round(x_best, 2)}")
         print(f"best value for Y:        {round(y_best, 2)}")
         print(f"best result:             {round(desired_best, 4)}")
-        print(
-            f"error to desired value:  {round((desired_best - desired)/desired*100,3)} %"
-        )
+        print(f"error to desired value:  {round((desired_best - desired)/desired*100,3)} %")
 
 
 def main():
