@@ -9,36 +9,40 @@ from typing import Generator, Callable
 ############################
 
 # desired value
-desired = 200
+desired = 251
 
 # is desired value an upper bound?
 # False: Find value that is closest to desired value
 # True: Find value that is closest to desired value, but not bigger than desired value
 is_upper_bound = False
 
-# X range (powers of 10 supported)
+# X range
 x_start = 100
-x_stop = 100000
+x_stop = 20000
 
-# set of e-rows (12, 24 and 48 supported)
-x_e_row = {"e12", "e24"}
+# set of e-rows (12, 24 and 48 supported),
+# e. g. x_e_row = {"e12, ""e24"}
+x_e_row = {"e24"}
 
-# Y range (powers of 10 supported)
+# Y range
 y_start = 100
-y_stop = 100000
+y_stop = 2000
 
-# set of e-rows (12, 24 and 48 supported)
-y_e_row = {"e12", "e24"}
+# set of e-rows (12, 24 and 48 supported),
+# e. g. x_e_row = {"e12, ""e24"}
+y_e_row = {"e24"}
 
 # Select desired formula by un-commenting lambda or add own lambda
 func = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
-# func = lambda x,y: (x*y) / (x+y)                                    # parallel resistors
-# func = lambda x,y: x + y                                            # series resistors
+# func = lambda x, y: (x * y) / (x + y)  # parallel resistors
+# func = lambda x, y: x + y  # series resistors
 # func = lambda x,y: x + x + y                                        # series resistors x3
 # func = lambda x,y: 1.016 * (x/y + 1)                                # LM43601 DC/DC switching converter output voltage
 # func = lambda x,y: (1.2/y) * (x + y)                                # LM43601 DC/DC swichting converter shutdown voltage
 # func = lambda x,y: 1.21 * (1 + (y/x)) + (3e-6 * x)                  # TPS73801 LDO output voltage
-# func = lambda x,y: y/(x+y)                                          # voltage divider (desired value is "amplification" e.g. 0.5 for a divider that divides in half)
+# func = lambda x, y: y / (
+#     x + y
+# )  # voltage divider (desired value is "output" to "input" voltage)
 # func = lambda x,y: 1.23 * (1 + x/y) + (-20e-9 * x)                  # LP2954 output voltage
 # func = lambda x,y: 1/(2*math.pi * (350 + 2*x) * y/1e9)              # differential analog filter on GMS (with "R2" in "nF")
 # func = lambda x,y: 1/(2*math.pi * (350 + 2*x) * (y/1e9 + 0.5/1e9))  # combined DM+CM analog filter on GMS (with "R2" in "nF" and 1 nF from each line to ground as CM part)
