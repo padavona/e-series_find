@@ -88,7 +88,6 @@ def get_start_decade(start: float) -> float:
 
 
 def get_base_values(erows: set[str]) -> set[float]:
-
     e12 = {1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2}
     e24 = {
         1.0,
@@ -352,10 +351,6 @@ def print_best_values(f: Callable) -> None:
         print(
             f"error to desired value:  {round((desired_best - desired)/desired*100,3)} %"
         )
-
-    # for i, x_value in enumerate(get_values(x_start, x_stop, get_base_values(x_e_row))):
-    #     print(x_value)
-    #     print(i)
 
 
 def main():
