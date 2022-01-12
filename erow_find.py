@@ -18,15 +18,15 @@ desired = 3000
 is_upper_bound = False
 
 # X range
-x_start = 2000
-x_stop = 2000
+x_start = 1500
+x_stop = 1500
 
 # set of e-rows (12, 24 and 48 supported),
 # e. g. x_e_row = {"e12, ""e24"}
 x_e_row = {"e12"}
 
 # Y range
-y_start = 100
+y_start = 0
 y_stop = 1000
 
 # set of e-rows (12, 24 and 48 supported),
@@ -59,9 +59,6 @@ func = lambda x, y: x + y  # series resistors
 ##########################
 # -- INPUT VALUES END -- #
 ##########################
-
-assert x_start <= x_stop, "stop value has to be greater or equal start value"
-assert y_start <= y_stop, "stop value has to be greater or equal start value"
 
 
 def get_decades(start: float, stop: float) -> int:
@@ -302,6 +299,15 @@ def get_values(
 
 
 def print_best_values(f: Callable) -> None:
+    assert (
+        x_start <= x_stop
+    ), "Stop value (X) has to be greater than or equal start value"
+    assert (
+        y_start <= y_stop
+    ), "Stop value (Y) has to be greater than or equal start value"
+    assert x_start != 0, "Start value (X) cannot be 0"
+    assert y_start != 0, "Start value (Y) cannot be 0"
+
     # pre-set best difference to some big value
     best_diff = 99999999
 
@@ -344,7 +350,10 @@ def print_best_values(f: Callable) -> None:
 
 
 def main():
-    print_best_values(func)
+    try:
+        print_best_values(func)
+    except AssertionError as e:
+        print(f"Assertion failed: {e}")
 
 
 if __name__ == "__main__":
