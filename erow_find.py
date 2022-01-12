@@ -10,7 +10,7 @@ import math
 ############################
 
 # desired value
-desired = 3000
+desired = 3213
 
 # is desired value an upper bound?
 # False: Find value that is closest to desired value
@@ -18,20 +18,20 @@ desired = 3000
 is_upper_bound = False
 
 # X range
-x_start = 1500
-x_stop = 1500
+x_start = 1
+x_stop = 1e6
 
-# set of e-rows (12, 24 and 48 supported),
+# set of e-rows (e12, e24, e48 and e96 supported),
 # e. g. x_e_row = {"e12, ""e24"}
-x_e_row = {"e12"}
+x_e_row = {"e12", "e24", "e48", "e96"}
 
 # Y range
-y_start = 0
-y_stop = 1000
+y_start = 1
+y_stop = 1e6
 
-# set of e-rows (12, 24 and 48 supported),
+# set of e-rows (e12, e24, e48 and e96 supported),
 # e. g. x_e_row = {"e12, ""e24"}
-y_e_row = {"e12"}
+y_e_row = {"e12", "e24", "e48", "e96"}
 
 # Select desired formula by un-commenting lambda or add own lambda
 # func = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
@@ -317,8 +317,12 @@ def print_best_values(f: Callable) -> None:
     desired_best = 0
 
     # find best values by testing every possible combination
+    no_x_values = True
+    no_y_values = True
     for x in get_values(x_start, x_stop, get_base_values(x_e_row)):
+        no_x_values = False
         for y in get_values(y_start, y_stop, get_base_values(y_e_row)):
+            no_y_values = False
             result = f(x, y)
 
             # find best value that is smaller than the desired value
@@ -339,14 +343,19 @@ def print_best_values(f: Callable) -> None:
                     desired_best = result
 
     # print best values
-    print(f"best value for X:        {round(x_best, 2)}")
-    print(f"best value for Y:        {round(y_best, 2)}")
-    print(f"best result:             {round(desired_best, 4)}")
-    print(f"error to desired value:  {round((desired_best - desired)/desired*100,3)} %")
+    if no_x_values == True or no_y_values == True:
+        print("At least one given range does not contain any e-values")
+    else:
+        print(f"best value for X:        {round(x_best, 2)}")
+        print(f"best value for Y:        {round(y_best, 2)}")
+        print(f"best result:             {round(desired_best, 4)}")
+        print(
+            f"error to desired value:  {round((desired_best - desired)/desired*100,3)} %"
+        )
 
     # for i, x_value in enumerate(get_values(x_start, x_stop, get_base_values(x_e_row))):
     #     print(x_value)
-    # # finally:
+    #     print(i)
 
 
 def main():
