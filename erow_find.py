@@ -53,7 +53,7 @@ func = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
 
 
 def get_decades(start: float, stop: float) -> int:
-    decades = 0
+    decades = 1
     while start * 10 <= stop:
         start *= 10
         decades += 1
@@ -176,7 +176,7 @@ def get_values(
     start: float, stop: float, base_values: set[float]
 ) -> Generator[float, None, None]:
     first_decade = get_start_decade(start)
-    no_of_decades = get_decades(first_decade, stop) + 1
+    no_of_decades = get_decades(first_decade, stop)
 
     decades = [first_decade]
     for i in range(no_of_decades):
