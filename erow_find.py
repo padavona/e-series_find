@@ -3,13 +3,14 @@
 # voltage regulator feedback networks.
 
 from typing import Generator, Callable
+import math
 
 ############################
 # -- INPUT VALUES BEGIN -- #
 ############################
 
 # desired value
-desired = 251
+desired = 3000
 
 # is desired value an upper bound?
 # False: Find value that is closest to desired value
@@ -17,39 +18,50 @@ desired = 251
 is_upper_bound = False
 
 # X range
-x_start = 100
-x_stop = 20000
+x_start = 2000
+x_stop = 2000
 
 # set of e-rows (12, 24 and 48 supported),
 # e. g. x_e_row = {"e12, ""e24"}
-x_e_row = {"e24"}
+x_e_row = {"e12"}
 
 # Y range
 y_start = 100
-y_stop = 2000
+y_stop = 1000
 
 # set of e-rows (12, 24 and 48 supported),
 # e. g. x_e_row = {"e12, ""e24"}
-y_e_row = {"e24"}
+y_e_row = {"e12"}
 
 # Select desired formula by un-commenting lambda or add own lambda
-func = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
+# func = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
 # func = lambda x, y: (x * y) / (x + y)  # parallel resistors
-# func = lambda x, y: x + y  # series resistors
-# func = lambda x,y: x + x + y                                        # series resistors x3
-# func = lambda x,y: 1.016 * (x/y + 1)                                # LM43601 DC/DC switching converter output voltage
-# func = lambda x,y: (1.2/y) * (x + y)                                # LM43601 DC/DC swichting converter shutdown voltage
-# func = lambda x,y: 1.21 * (1 + (y/x)) + (3e-6 * x)                  # TPS73801 LDO output voltage
+func = lambda x, y: x + y  # series resistors
+# func = lambda x, y: x + x + y  # series resistors x3
+# func = lambda x, y: 1.016 * (
+#     x / y + 1
+# )  # LM43601 DC/DC switching converter output voltage
+# func = lambda x, y: (1.2 / y) * (
+#     x + y
+# )  # LM43601 DC/DC swichting converter shutdown voltage
+# func = lambda x, y: 1.21 * (1 + (y / x)) + (3e-6 * x)  # TPS73801 LDO output voltage
 # func = lambda x, y: y / (
 #     x + y
 # )  # voltage divider (desired value is "output" to "input" voltage)
-# func = lambda x,y: 1.23 * (1 + x/y) + (-20e-9 * x)                  # LP2954 output voltage
-# func = lambda x,y: 1/(2*math.pi * (350 + 2*x) * y/1e9)              # differential analog filter on GMS (with "R2" in "nF")
-# func = lambda x,y: 1/(2*math.pi * (350 + 2*x) * (y/1e9 + 0.5/1e9))  # combined DM+CM analog filter on GMS (with "R2" in "nF" and 1 nF from each line to ground as CM part)
+# func = lambda x, y: 1.23 * (1 + x / y) + (-20e-9 * x)  # LP2954 output voltage
+# func = lambda x, y: 1 / (
+#     2 * math.pi * (350 + 2 * x) * y / 1e9
+# )  # differential analog filter on GMS (with "R2" in "nF")
+# func = lambda x, y: 1 / (
+#     2 * math.pi * (350 + 2 * x) * (y / 1e9 + 0.5 / 1e9)
+# )  # combined DM+CM analog filter on GMS (with "R2" in "nF" and 1 nF from each line to ground as CM part)
 
 ##########################
 # -- INPUT VALUES END -- #
 ##########################
+
+assert x_start <= x_stop, "stop value has to be greater or equal start value"
+assert y_start <= y_stop, "stop value has to be greater or equal start value"
 
 
 def get_decades(start: float, stop: float) -> int:
@@ -157,6 +169,104 @@ def get_base_values(erows: set[str]) -> set[float]:
         9.09,
         9.53,
     }
+    e96 = {
+        1.00,
+        1.02,
+        1.05,
+        1.07,
+        1.10,
+        1.13,
+        1.15,
+        1.18,
+        1.21,
+        1.24,
+        1.27,
+        1.30,
+        1.33,
+        1.37,
+        1.40,
+        1.43,
+        1.47,
+        1.50,
+        1.54,
+        1.58,
+        1.62,
+        1.65,
+        1.69,
+        1.74,
+        1.78,
+        1.82,
+        1.87,
+        1.91,
+        1.96,
+        2.00,
+        2.05,
+        2.10,
+        2.15,
+        2.21,
+        2.26,
+        2.32,
+        2.37,
+        2.43,
+        2.49,
+        2.55,
+        2.61,
+        2.67,
+        2.74,
+        2.80,
+        2.87,
+        2.94,
+        3.01,
+        3.09,
+        3.16,
+        3.24,
+        3.32,
+        3.40,
+        3.48,
+        3.57,
+        3.65,
+        3.74,
+        3.83,
+        3.92,
+        4.02,
+        4.12,
+        4.22,
+        4.32,
+        4.42,
+        4.53,
+        4.64,
+        4.75,
+        4.87,
+        4.99,
+        5.11,
+        5.23,
+        5.36,
+        5.49,
+        5.62,
+        5.76,
+        5.90,
+        6.04,
+        6.19,
+        6.34,
+        6.49,
+        6.65,
+        6.81,
+        6.98,
+        7.15,
+        7.32,
+        7.50,
+        7.68,
+        7.87,
+        8.06,
+        8.25,
+        8.45,
+        8.66,
+        8.87,
+        9.09,
+        9.31,
+        9.53,
+        9.76,
+    }
 
     base_values = set()
     for erow in erows:
@@ -166,6 +276,8 @@ def get_base_values(erows: set[str]) -> set[float]:
             base_values.update(e24)
         elif erow == "e48":
             base_values.update(e48)
+        elif erow == "e96":
+            base_values.update(e96)
         else:
             print("invalid e-row")
 
@@ -199,25 +311,25 @@ def print_best_values(f: Callable) -> None:
     desired_best = 0
 
     # find best values by testing every possible combination
-    for i in get_values(x_start, x_stop, get_base_values(x_e_row)):
-        for j in get_values(y_start, y_stop, get_base_values(y_e_row)):
-            result = f(i, j)
+    for x in get_values(x_start, x_stop, get_base_values(x_e_row)):
+        for y in get_values(y_start, y_stop, get_base_values(y_e_row)):
+            result = f(x, y)
 
             # find best value that is smaller than the desired value
             if is_upper_bound:
                 diff = desired - result
                 if (diff < best_diff) and (diff >= 0):
                     best_diff = diff
-                    x_best = i
-                    y_best = j
+                    x_best = x
+                    y_best = y
                     desired_best = result
             # find best value
             else:
                 diff = abs(desired - result)
                 if diff < best_diff:
                     best_diff = diff
-                    x_best = i
-                    y_best = j
+                    x_best = x
+                    y_best = y
                     desired_best = result
 
     # print best values
@@ -225,6 +337,10 @@ def print_best_values(f: Callable) -> None:
     print(f"best value for Y:        {round(y_best, 2)}")
     print(f"best result:             {round(desired_best, 4)}")
     print(f"error to desired value:  {round((desired_best - desired)/desired*100,3)} %")
+
+    # for i, x_value in enumerate(get_values(x_start, x_stop, get_base_values(x_e_row))):
+    #     print(x_value)
+    # # finally:
 
 
 def main():
