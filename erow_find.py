@@ -527,8 +527,16 @@ def print_best_values(f: Callable) -> None:
     if no_x_values == True or no_y_values == True:
         print("At least one given range does not contain any e-values")
     else:
-        print(f"best value for X:        {round(x_best, 2)}")
-        print(f"best value for Y:        {round(y_best, 2)}")
+        print(
+            "best value for X:        {} ({})".format(
+                round(x_best, 2), ", ".join(get_e_row(x_best))
+            )
+        )
+        print(
+            "best value for X:        {} ({})".format(
+                round(y_best, 2), ", ".join(get_e_row(y_best))
+            )
+        )
         print(f"best result:             {round(desired_best, 4)}")
         print(f"error to desired value:  {round((desired_best - desired)/desired*100,3)} %")
 
