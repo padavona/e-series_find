@@ -1,6 +1,5 @@
-# This script finds the optimal combination of two
-# passive components, e. g. for op amp gain or
-# voltage regulator feedback networks.
+# This script finds the optimal combination of two values
+# that are within an e-series of preferred numbers
 
 from typing import Generator, Callable
 import math
@@ -10,33 +9,33 @@ import math
 ############################
 
 # desired value
-desired = 1111
+DESIRED = 200
 
 # is desired value an upper bound?
 # False: Find value that is closest to desired value
 # True: Find value that is closest to desired value, but not bigger than desired value
-is_upper_bound = False
+IS_UPPER_BOUND = False
 
 # X range
-x_start = 100
-x_stop = 200
+X_START = 2000
+X_STOP = 20000
 
-# set of e-rows (e12, e24, e48 and e96 supported),
-# e. g. x_e_row = {"e12, "e24"}
-x_e_row = {"e12", "e24"}
+# set of e-series (e12, e24, e48 and e96 supported),
+# e. g. X_E_SERIES = {"e12, "e24"}
+X_E_SERIES = {"e12", "e24"}
 
 # Y range
-y_start = 100
-y_stop = 1e6
+Y_START = 100
+Y_STOP = 400
 
-# set of e-rows (e12, e24, e48 and e96 supported),
-# e. g. x_e_row = {"e12, "e24"}
-y_e_row = {"e12", "e24"}
+# set of e-series (e12, e24, e48 and e96 supported),
+# e. g. Y_E_SERIES = {"e12, "e24"}
+Y_E_SERIES = {"e12", "e24"}
 
 # Select desired formula by un-commenting lambda or add own lambda
-# func = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
+func = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
 # func = lambda x, y: (x * y) / (x + y)  # parallel resistors
-func = lambda x, y: x + y  # series resistors
+# func = lambda x, y: x + y  # series resistors
 # func = lambda x, y: x + x + y  # series resistors x3
 # func = lambda x, y: 1.016 * (x / y + 1)  # LM43601 DC/DC switching converter output voltage
 # func = lambda x, y: (1.2 / y) * (x + y)  # LM43601 DC/DC swichting converter shutdown voltage
@@ -256,7 +255,7 @@ def get_start_decade(start: float) -> float:
         return None
 
 
-def get_e_row(value: float) -> Generator[str, None, None]:
+def get_e_series(value: float) -> Generator[str, None, None]:
     assert value > 0, "value has to be greater than 0"
 
     if value >= 10:
@@ -278,19 +277,19 @@ def get_e_row(value: float) -> Generator[str, None, None]:
         yield "E-96"
 
 
-def get_base_values(erows: set[str]) -> set[float]:
+def get_base_values(e_series: set[str]) -> set[float]:
     base_values = set()
-    for erow in erows:
-        if erow == "e12":
+    for series in e_series:
+        if series == "e12":
             base_values.update(E12_BASE)
-        elif erow == "e24":
+        elif series == "e24":
             base_values.update(E24_BASE)
-        elif erow == "e48":
+        elif series == "e48":
             base_values.update(E48_BASE)
-        elif erow == "e96":
+        elif series == "e96":
             base_values.update(E96_BASE)
         else:
-            print("invalid e-row")
+            print("invalid e-series")
 
     return base_values
 
@@ -312,10 +311,10 @@ def get_values(start: float, stop: float, base_values: set[float]) -> Generator[
 
 
 def print_best_values(f: Callable) -> None:
-    assert x_start <= x_stop, "Stop value (X) has to be greater than or equal start value"
-    assert y_start <= y_stop, "Stop value (Y) has to be greater than or equal start value"
-    assert x_start != 0, "Start value (X) cannot be 0"
-    assert y_start != 0, "Start value (Y) cannot be 0"
+    assert X_START <= X_STOP, "Stop value (X) has to be greater than or equal start value"
+    assert Y_START <= Y_STOP, "Stop value (Y) has to be greater than or equal start value"
+    assert X_START != 0, "Start value (X) cannot be 0"
+    assert Y_START != 0, "Start value (Y) cannot be 0"
 
     # pre-set best difference to some big value
     best_diff = 99999999
@@ -328,15 +327,15 @@ def print_best_values(f: Callable) -> None:
     # find best values by testing every possible combination
     no_x_values = True
     no_y_values = True
-    for x in get_values(x_start, x_stop, get_base_values(x_e_row)):
+    for x in get_values(X_START, X_STOP, get_base_values(X_E_SERIES)):
         no_x_values = False
-        for y in get_values(y_start, y_stop, get_base_values(y_e_row)):
+        for y in get_values(Y_START, Y_STOP, get_base_values(Y_E_SERIES)):
             no_y_values = False
             result = f(x, y)
 
             # find best value that is smaller than the desired value
-            if is_upper_bound:
-                diff = desired - result
+            if IS_UPPER_BOUND:
+                diff = DESIRED - result
                 if (diff < best_diff) and (diff >= 0):
                     best_diff = diff
                     x_best = x
@@ -344,7 +343,7 @@ def print_best_values(f: Callable) -> None:
                     desired_best = result
             # find best value
             else:
-                diff = abs(desired - result)
+                diff = abs(DESIRED - result)
                 if diff < best_diff:
                     best_diff = diff
                     x_best = x
@@ -355,10 +354,10 @@ def print_best_values(f: Callable) -> None:
     if no_x_values == True or no_y_values == True:
         print("At least one given range does not contain any e-values")
     else:
-        print("best value for X:        {} ({})".format(round(x_best, 2), ", ".join(get_e_row(x_best))))
-        print("best value for X:        {} ({})".format(round(y_best, 2), ", ".join(get_e_row(y_best))))
-        print("best result:             {}".format(round(desired_best, 4)))
-        print("error to desired value:  {} %".format(round((desired_best - desired) / desired * 100, 3)))
+        print("best value for X:   {} ({})".format(round(x_best, 2), ", ".join(get_e_series(x_best))))
+        print("best value for Y:   {} ({})".format(round(y_best, 2), ", ".join(get_e_series(y_best))))
+        print("best result:        {}".format(round(desired_best, 4)))
+        print("error to desired:   {} %".format(round((desired_best - DESIRED) / DESIRED * 100, 3)))
 
 
 def main():
