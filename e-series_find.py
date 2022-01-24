@@ -42,7 +42,7 @@ func = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
 # func = lambda x, y: 1.21 * (1 + (y / x)) + (3e-6 * x)  # TPS73801 LDO output voltage
 # func = lambda x, y: y / (x + y)  # voltage divider (desired value is "output" to "input" voltage)
 # func = lambda x, y: 1.23 * (1 + x / y) + (-20e-9 * x)  # LP2954 output voltage
-# func = lambda x, y: 1 / (2 * math.pi * (350 + 2 * x) * y)  # differential analog filter on GMS
+# func = lambda x, y: 1 / (2 * math.pi * (350 + 2 * x) * y)  # differential analog filter
 # func = lambda x, y: 1 / (
 #     2 * math.pi * (350 + 2 * x) * (y / 1e9 + 0.5 / 1e9)
 # )  # combined DM+CM analog filter after a 350 ohms strain gauge bridge (with "y" in "nF" and 1 nF from each line to ground as CM part)
