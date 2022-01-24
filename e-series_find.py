@@ -320,9 +320,9 @@ def print_best_values(f: Callable) -> None:
     best_diff = 99999999
 
     # buffer for best values
-    x_best = 0
-    y_best = 0
-    desired_best = 0
+    best_x = 0
+    best_y = 0
+    best_result = 0
 
     # find best values by testing every possible combination
     no_x_values = True
@@ -331,33 +331,33 @@ def print_best_values(f: Callable) -> None:
         no_x_values = False
         for y in get_values(Y_START, Y_STOP, get_base_values(Y_E_SERIES)):
             no_y_values = False
-            result = f(x, y)
+            act_result = f(x, y)
 
             # find best value that is smaller than the desired value
             if IS_UPPER_BOUND:
-                diff = DESIRED - result
+                diff = DESIRED - act_result
                 if (diff < best_diff) and (diff >= 0):
                     best_diff = diff
-                    x_best = x
-                    y_best = y
-                    desired_best = result
+                    best_x = x
+                    best_y = y
+                    best_result = act_result
             # find best value
             else:
-                diff = abs(DESIRED - result)
+                diff = abs(DESIRED - act_result)
                 if diff < best_diff:
                     best_diff = diff
-                    x_best = x
-                    y_best = y
-                    desired_best = result
+                    best_x = x
+                    best_y = y
+                    best_result = act_result
 
     # print best values
     if no_x_values == True or no_y_values == True:
         print("At least one given range does not contain any e-values")
     else:
-        print("best value for X:   {} ({})".format(round(x_best, 2), ", ".join(get_e_series(x_best))))
-        print("best value for Y:   {} ({})".format(round(y_best, 2), ", ".join(get_e_series(y_best))))
-        print("best result:        {}".format(round(desired_best, 4)))
-        print("error to desired:   {} %".format(round((desired_best - DESIRED) / DESIRED * 100, 3)))
+        print("best value for X:   {} ({})".format(round(best_x, 2), ", ".join(get_e_series(best_x))))
+        print("best value for Y:   {} ({})".format(round(best_y, 2), ", ".join(get_e_series(best_y))))
+        print("best result:        {}".format(round(best_result, 4)))
+        print("error to desired:   {} %".format(round((best_result - DESIRED) / DESIRED * 100, 3)))
 
 
 def main():
