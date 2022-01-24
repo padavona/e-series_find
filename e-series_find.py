@@ -45,7 +45,7 @@ func = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
 # func = lambda x, y: 1 / (2 * math.pi * (350 + 2 * x) * y)  # differential analog filter on GMS
 # func = lambda x, y: 1 / (
 #     2 * math.pi * (350 + 2 * x) * (y / 1e9 + 0.5 / 1e9)
-# )  # combined DM+CM analog filter on GMS (with "R2" in "nF" and 1 nF from each line to ground as CM part)
+# )  # combined DM+CM analog filter after a 350 ohms strain gauge bridge (with "y" in "nF" and 1 nF from each line to ground as CM part)
 
 ##########################
 # -- INPUT VALUES END -- #
