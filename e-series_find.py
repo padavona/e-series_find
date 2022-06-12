@@ -9,49 +9,57 @@ import math
 ############################
 
 # desired value
-DESIRED = 200
+DESIRED = 20e-3
 
 # is desired value an upper bound?
 # False: Find value that is closest to desired value
 # True: Find value that is closest to desired value, but not bigger than desired value
-IS_UPPER_BOUND = False
+IS_UPPER_BOUND = True
 
 # X range
-X_START = 2000
-X_STOP = 20000
+X_START = 1
+X_STOP = 100e3
 
-# set of e-series (e12, e24, e48 and e96 supported),
+# set of e-series (e6, e12, e24, e48 and e96 supported),
 # e. g. X_E_SERIES = {"e12, "e24"}
 X_E_SERIES = {"e12", "e24"}
 
 # Y range
-Y_START = 100
-Y_STOP = 400
+Y_START = 6.8
+Y_STOP = 6.8
 
-# set of e-series (e12, e24, e48 and e96 supported),
+# set of e-series (e6, e12, e24, e48 and e96 supported),
 # e. g. Y_E_SERIES = {"e12, "e24"}
 Y_E_SERIES = {"e12", "e24"}
 
 # Select desired formula by un-commenting lambda or add own lambda
-func = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
-# func = lambda x, y: (x * y) / (x + y)  # parallel resistors
-# func = lambda x, y: x + y  # series resistors
-# func = lambda x, y: x + x + y  # series resistors x3
-# func = lambda x, y: 1.016 * (x / y + 1)  # LM43601 DC/DC switching converter output voltage
-# func = lambda x, y: (1.2 / y) * (x + y)  # LM43601 DC/DC swichting converter shutdown voltage
-# func = lambda x, y: 1.21 * (1 + (y / x)) + (3e-6 * x)  # TPS73801 LDO output voltage
-# func = lambda x, y: y / (x + y)  # voltage divider (desired value is "output" to "input" voltage)
-# func = lambda x, y: 1.23 * (1 + x / y) + (-20e-9 * x)  # LP2954 output voltage
-# func = lambda x, y: 1 / (2 * math.pi * (350 + 2 * x) * y)  # differential analog filter
-# func = lambda x, y: 1 / (
+# FUNC = lambda x, y: (2 * x / y) + 1  # instrumentation amplifier gain
+# FUNC = lambda x, y: (x * y) / (x + y)  # parallel resistors
+# FUNC = lambda x, y: x + y  # series resistors
+# FUNC = lambda x, y: x + x + y  # series resistors x3
+# FUNC = lambda x, y: 1.016 * (x / y + 1)  # LM43601 DC/DC switching converter output voltage
+# FUNC = lambda x, y: (1.2 / y) * (x + y)  # LM43601 DC/DC swichting converter shutdown voltage
+# FUNC = lambda x, y: 1.21 * (1 + (y / x)) + (3e-6 * x)  # TPS73801 LDO output voltage
+# FUNC = lambda x, y: y / (x + y)  # voltage divider (desired value is "output" to "input" voltage)
+# FUNC = lambda x, y: 1.23 * (1 + x / y) + (-20e-9 * x)  # LP2954 output voltage
+# FUNC = lambda x, y: 1 / (2 * math.pi * (350 + 2 * x) * y)  # differential analog filter
+# FUNC = lambda x, y: 1 / (
 #     2 * math.pi * (350 + 2 * x) * (y / 1e9 + 0.5 / 1e9)
 # )  # combined DM+CM analog filter after a 350 ohms strain gauge bridge (with "y" in "nF" and 1 nF from each line to ground as CM part)
+# FUNC = lambda x, y: ((x + x) * y) / (
+#     (x + x) + y
+# )  # differential I2C termination network impedance (x: resistor to GND and VCC, y: resistor between + and -)
+FUNC = (
+    lambda x, y: (5.0 - 3.2) / x
+)  # desired value is LED current at operating point (supply voltage - diode voltage drop at operating point) / limiting resistor value
+
 
 ##########################
 # -- INPUT VALUES END -- #
 ##########################
 
 # base values
+E6_BASE = {1.0, 1.5, 2.2, 3.3, 4.7, 6.8}
 E12_BASE = {1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2}
 E24_BASE = {
     1.0,
@@ -267,6 +275,8 @@ def get_e_series(value: float) -> Generator[str, None, None]:
 
     value = round(value, 2)
 
+    if value in E6_BASE:
+        yield "E-6"
     if value in E12_BASE:
         yield "E-12"
     if value in E24_BASE:
@@ -280,7 +290,9 @@ def get_e_series(value: float) -> Generator[str, None, None]:
 def get_base_values(e_series: set[str]) -> set[float]:
     base_values = set()
     for series in e_series:
-        if series == "e12":
+        if series == "e6":
+            base_values.update(E6_BASE)
+        elif series == "e12":
             base_values.update(E12_BASE)
         elif series == "e24":
             base_values.update(E24_BASE)
@@ -317,12 +329,12 @@ def print_best_values(f: Callable) -> None:
     assert Y_START != 0, "Start value (Y) cannot be 0"
 
     # pre-set best difference to some big value
-    best_diff = 99999999
+    best_diff = float("inf")
 
     # buffer for best values
-    best_x = 0
-    best_y = 0
-    best_result = 0
+    best_x = 0.0
+    best_y = 0.0
+    best_result = 0.0
 
     # find best values by testing every possible combination
     no_x_values = True
@@ -353,6 +365,8 @@ def print_best_values(f: Callable) -> None:
     # print best values
     if no_x_values == True or no_y_values == True:
         print("At least one given range does not contain any e-values")
+    elif best_x == 0.0 or best_y == 0.0:
+        print("No solution found for given constraints")
     else:
         print("best value for X:   {} ({})".format(round(best_x, 2), ", ".join(get_e_series(best_x))))
         print("best value for Y:   {} ({})".format(round(best_y, 2), ", ".join(get_e_series(best_y))))
@@ -362,7 +376,7 @@ def print_best_values(f: Callable) -> None:
 
 def main():
     try:
-        print_best_values(func)
+        print_best_values(FUNC)
     except AssertionError as e:
         print(f"Assertion failed: {e}")
 
