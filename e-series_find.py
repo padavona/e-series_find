@@ -20,7 +20,7 @@ IS_UPPER_BOUND = True
 X_START = 1
 X_STOP = 100e3
 
-# set of e-series (e6, e12, e24, e48 and e96 supported),
+# set of e-series (e3, e6, e12, e24, e48 and e96 supported),
 # e. g. X_E_SERIES = {"e12, "e24"}
 X_E_SERIES = {"e12", "e24"}
 
@@ -28,7 +28,7 @@ X_E_SERIES = {"e12", "e24"}
 Y_START = 6.8
 Y_STOP = 6.8
 
-# set of e-series (e6, e12, e24, e48 and e96 supported),
+# set of e-series (e3, e6, e12, e24, e48 and e96 supported),
 # e. g. Y_E_SERIES = {"e12, "e24"}
 Y_E_SERIES = {"e12", "e24"}
 
@@ -50,7 +50,7 @@ Y_E_SERIES = {"e12", "e24"}
 #     (x + x) + y
 # )  # differential I2C termination network impedance (x: resistor to GND and VCC, y: resistor between + and -)
 FUNC = (
-    lambda x, y: (5.0 - 3.2) / x
+    lambda x, y: (5.0 - 2.1) / x
 )  # desired value is LED current at operating point (supply voltage - diode voltage drop at operating point) / limiting resistor value
 
 
