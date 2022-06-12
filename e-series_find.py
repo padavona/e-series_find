@@ -59,6 +59,7 @@ FUNC = (
 ##########################
 
 # base values
+E3_BASE = {1.0, 2.2, 4.7}
 E6_BASE = {1.0, 1.5, 2.2, 3.3, 4.7, 6.8}
 E12_BASE = {1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2}
 E24_BASE = {
@@ -275,22 +276,26 @@ def get_e_series(value: float) -> Generator[str, None, None]:
 
     value = round(value, 2)
 
+    if value in E3_BASE:
+        yield "E3"
     if value in E6_BASE:
-        yield "E-6"
+        yield "E6"
     if value in E12_BASE:
-        yield "E-12"
+        yield "E12"
     if value in E24_BASE:
-        yield "E-24"
+        yield "E24"
     if value in E48_BASE:
-        yield "E-48"
+        yield "E48"
     if value in E96_BASE:
-        yield "E-96"
+        yield "E96"
 
 
 def get_base_values(e_series: set[str]) -> set[float]:
     base_values = set()
     for series in e_series:
-        if series == "e6":
+        if series == "e3":
+            base_values.update(E3_BASE)
+        elif series == "e6":
             base_values.update(E6_BASE)
         elif series == "e12":
             base_values.update(E12_BASE)
